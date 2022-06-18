@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebRTC: Simple RTCDataChannel sample</title>
+    <meta charset="utf-8" />
+    {% comment %}
+    <script src="../adapter.js" defer></script>
+    {% endcomment %} {% comment %}
+    <script src="main.js" defer></script>
+    {% endcomment %}
+    <link
+      rel="stylesheet"
+      href="{% static 'css/main.css' %}"
+      type="text/css"
+      media="all"
+    />
+    <script src="{% static 'js/connect.js' %}" defer></script>
+  </head>
+  <body>
+    <h1>MDN - WebRTC sample</h1>
+    <b>{{code}}</b>
+
+    <div class="controlbox">
+      <label for="message"
+        >Enter the code to connect:
+        <input
+          type="text"
+          name="message"
+          id="message"
+          placeholder="code here"
+          size="10"
+          maxlength="20"
+        />
+      </label>
+      <button id="connectButton" name="connectButton" class="buttonleft">
+        Connect
+      </button>
+    </div>
+
+    <button id="sendButton12" name="sendButton12" class="buttonright">
+      Send
+    </button>
+  </body>
+</html>
