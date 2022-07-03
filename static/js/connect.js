@@ -1,86 +1,49 @@
-// import { ReconnectingWebSocket } from "./reconnecting-websocket.min.js";
+let localConnection;
+let remoteConnection;
+let sendChannel;
+let receiveChannel;
+let fileReader;
+var iceCandidatesCollected = [];
+
+const configuration = {
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+};
+
+const bitrateDiv = document.querySelector("div#bitrate");
+const fileInput = document.querySelector("input#fileInput");
+const abortButton = document.querySelector("button#abortButton");
+const downloadAnchor = document.querySelector("a#download");
+const sendProgress = document.querySelector("progress#sendProgress");
+const receiveProgress = document.querySelector("progress#receiveProgress");
+const statusMessage = document.querySelector("span#status");
+const sendFileButton = document.querySelector("button#sendFile");
+
+var browserCode = document.querySelector("#browser-code").innerHTML;
+
+let receiveBuffer = [];
+let receivedSize = 0;
+let bytesPrev = 0;
+let timestampPrev = 0;
+let timestampStart;
+let statsInterval = null;
+let bitrateMax = 0;
+var peerConn;
 
 let ws_scheme = window.location.protocol == "https:" ? "wss://" : "ws://";
 
-let sendChannel;
-
-async function gotLocalDescription(desc) {
-  await localConnection.setLocalDescription(desc);
-  console.log(`Offer from localConnection\n ${desc.sdp}`);
-  await remoteConnection.setRemoteDescription(desc);
-  try {
-    const answer = await remoteConnection.createAnswer();
-    await gotRemoteDescription(answer);
-  } catch (e) {
-    console.log("Failed to create session description: ", e);
-  }
-}
-
-function onSendChannelStateChange() {
-  if (sendChannel) {
-    const { readyState } = sendChannel;
-    console.log(`Send channel state is: ${readyState}`);
-    if (readyState === "open") {
-      sendData();
-    }
-  }
-}
-const sendFileButton = document.querySelector("button#sendButton12");
-
-sendFileButton.addEventListener("click", () => createConnection());
-
-async function createConnection() {
-  // abortButton.disabled = false;
-  // sendFileButton.disabled = true;
-  localConnection = new RTCPeerConnection();
-  console.log("Created local peer connection object localConnection");
-
-  sendChannel = localConnection.createDataChannel("sendDataChannel");
-  sendChannel.binaryType = "arraybuffer";
-  console.log("Created send data channel", sendChannel);
-
-  sendChannel.addEventListener("open", onSendChannelStateChange);
-  sendChannel.addEventListener("close", onSendChannelStateChange);
-  // sendChannel.addEventListener('error', onError);
-
-  localConnection.addEventListener("icecandidate", async (event) => {
-    console.log("Local ICE candidate: ", event.candidate);
-    await remoteConnection.addIceCandidate(event.candidate);
-  });
-
-  remoteConnection = new RTCPeerConnection();
-  console.log("Created remote peer connection object remoteConnection");
-
-  remoteConnection.addEventListener("icecandidate", async (event) => {
-    console.log("Remote ICE candidate: ", event.candidate);
-    await localConnection.addIceCandidate(event.candidate);
-  });
-  // remoteConnection.addEventListener('datachannel', receiveChannelCallback);
-
-  try {
-    const offer = await localConnection.createOffer();
-    await gotLocalDescription(offer);
-  } catch (e) {
-    console.log("Failed to create session description: ", e);
-  }
-
-  // fileInput.disabled = true;
-}
-
-const socketconnection = document.getElementById("connectButton");
-var inputValue = document.getElementById("message");
-socketconnection.addEventListener("click", () => {
-  console.log(inputValue.value);
+async function websocket() {
   let endpoint =
     ws_scheme + window.location.host + `/ws/connect/${inputValue.value}/`;
-  var socket = new WebSocket(endpoint);
+  window.socket = new WebSocket(endpoint);
 
   socket.onopen = async function (e) {
     console.log("Connection established!");
   };
 
   socket.onmessage = async function (e) {
-    console.log("message", e);
+    const data = JSON.parse(e.data);
+    document.querySelector("#chat-log").value += data.message + "\n";
+    message_process(e);
   };
 
   socket.onerror = async function (e) {
@@ -90,4 +53,175 @@ socketconnection.addEventListener("click", () => {
   socket.onclose = async function (e) {
     console.log("close", e);
   };
+}
+
+async function message_process(e) {
+  const peerConn = new RTCPeerConnection(configuration);
+  const data = JSON.parse(e.data);
+  if (data.message.type === "offer") {
+    if (data.sender !== browserCode) {
+      remoteRTCMessage = data.message;
+      peerConn.setRemoteDescription(
+        new RTCSessionDescription(remoteRTCMessage)
+      );
+
+      const answer = await peerConn.createAnswer();
+      await peerConn.setLocalDescription(answer);
+      socket.send(
+        JSON.stringify({
+          msg_type: "answer",
+          answer: answer,
+          sender: data.sender,
+          answerer: browserCode,
+        })
+      );
+    }
+  } else if (data.message.type === "answer") {
+    if (data.answerer !== browserCode) {
+      console.log(data.message);
+      remoteRTCMessage = data.message;
+      await peerConn.setRemoteDescription(
+        new RTCSessionDescription(remoteRTCMessage)
+      );
+      console.log("Answered");
+    };
+
+  } else if (data.msg_type === "candidate") {
+    if (data.fromUser !== "{{request.user.username}}") {
+      try {
+        if (peerConn) {
+          data.candidate && (await peerConn.addIceCandidate(data.candidate));
+        } else {
+          iceCandidatesFromCaller.push(data.candidate);
+        }
+      } catch (e) {
+      }
+    }
+  }
+};
+
+// sendFileButton.addEventListener("click", () => createConnection());
+fileInput.addEventListener("change", handleFileInputChange, false);
+abortButton.addEventListener("click", () => {
+  if (fileReader && fileReader.readyState === 1) {
+    console.log("Abort read!");
+    fileReader.abort();
+  }
 });
+
+async function handleFileInputChange() {
+  const file = fileInput.files[0];
+  if (!file) {
+    console.log("No file chosen");
+  } else {
+    sendFileButton.disabled = false;
+  }
+}
+
+async function createConnection() {
+  abortButton.disabled = false;
+  sendFileButton.disabled = true;
+
+  const localConnection = new RTCPeerConnection(configuration);
+  sendChannel = localConnection.createDataChannel("sendDataChannel");
+  sendChannel.binaryType = "arraybuffer";
+  console.log("Created send data channel");
+
+  sendChannel.addEventListener("open", onSendChannelStateChange);
+  sendChannel.addEventListener("close", onSendChannelStateChange);
+  sendChannel.addEventListener("error", onError);
+
+
+  try {
+    const offer = await localConnection.createOffer();
+    // offer is RTCSessionDescription object
+    await localConnection.setLocalDescription(offer);
+    socket.send(
+      JSON.stringify({
+        msg_type: "offer",
+        sender: browserCode,
+        offer: offer,
+      })
+    );
+  } catch (e) {
+    console.log("Failed to create session description: ", e);
+  }
+
+  fileInput.disabled = true;
+}
+
+function closeDataChannels() {
+  sendChannel.close();
+  sendChannel = null;
+  if (receiveChannel) {
+    receiveChannel.close();
+    receiveChannel = null;
+  }
+  localConnection.close();
+  remoteConnection.close();
+  localConnection = null;
+  remoteConnection = null;
+  console.log("Closed peer connections");
+
+  // re-enable the file select
+  fileInput.disabled = false;
+  abortButton.disabled = true;
+  sendFileButton.disabled = false;
+}
+
+
+async function gotRemoteDescription(desc) {
+  await remoteConnection.setLocalDescription(desc);
+  await localConnection.setRemoteDescription(desc);
+}
+
+function onSendChannelStateChange() {
+  if (sendChannel) {
+    const { readyState } = sendChannel;
+    if (readyState === "open") {
+      sendData();
+    }
+    onSendChannelStateChange;
+  }
+}
+
+function onError(error) {
+  if (sendChannel) {
+    console.error("Error in sendChannel:", error);
+    return;
+  }
+}
+// const sendFileButton = document.querySelector("button#sendButton12");
+
+sendFileButton.addEventListener("click", () => createConnection());
+
+const socketconnection = document.getElementById("connectButton");
+var inputValue = document.getElementById("message");
+socketconnection.addEventListener("click", () => {
+  websocket();
+  document.querySelector("#chatbutton").onclick = function (e) {
+    const messageInputDom = document.querySelector("#chat");
+    const message = messageInputDom.value;
+    socket.send(
+      JSON.stringify({
+        message: message,
+      })
+    );
+    messageInputDom.value = "";
+  };
+});
+
+// async function creatertcpeer() {
+//   peerConn = new RTCPeerConnection(iceServers);
+
+//   peerConn.addEventListener("icecandidate", (event) => {
+//     if (event.candidate) {
+//       socket.send(
+//         JSON.stringify({
+//           msg_type: "candidate",
+//           candidate: event.candidate,
+//         })
+//       );
+//     }
+//   });
+// }

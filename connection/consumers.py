@@ -11,30 +11,43 @@ class SharingConsumer(AsyncWebsocketConsumer):
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
-        await self.accept()  # Accept connection
-        await self.send(
-            text_data=json.dumps(
-                {"type": "connection", "data": {"message": "Connected"}}
-            )
-        )
+        await self.accept()
 
     async def disconnect(self, close_code):
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-    # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        print(message)
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat_message", "message": message}
-        )
+        if text_data_json["msg_type"] == "offer":
+            offer = text_data_json.get("offer")
+            sender = text_data_json.get("sender")
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "chat_message", "offer": offer, "sender": sender},
+            )
 
-    # Receive message from room group
+        if text_data_json["msg_type"] == "answer":
+            print(text_data_json)
+            answer = text_data_json.get("answer")
+            answerer = text_data_json.get("answerer")
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "chat_answer",
+                    "answer": answer,
+                    "answerer": answerer,
+                },
+            )
+
     async def chat_message(self, event):
-        message = event["message"]
+        message = event["offer"]
+        sender = event["sender"]
+        await self.send(text_data=json.dumps({"message": message, "sender": sender}))
 
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+    async def chat_answer(self, event):
+        message = event["answer"]
+        answerer = event["answerer"]
+        await self.send(
+            text_data=json.dumps({"message": message, "answerer": answerer})
+        )
