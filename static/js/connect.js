@@ -55,15 +55,45 @@ async function websocket() {
   };
 }
 
+async function creatertcpeer() {
+  peerConn = new RTCPeerConnection(configuration);
+
+  peerConn.addEventListener("icecandidate", (event) => {
+    console.log(event.candidate);
+    if (event.candidate) {
+      socket.send(
+        JSON.stringify({
+          msg_type: "candidate",
+          // sender: sender,
+          candidate: event.candidate,
+        })
+      );
+    }
+  });
+}
+
 async function message_process(e) {
-  const peerConn = new RTCPeerConnection(configuration);
+  // const peerConn = new RTCPeerConnection(configuration);
   const data = JSON.parse(e.data);
   if (data.message.type === "offer") {
     if (data.sender !== browserCode) {
       remoteRTCMessage = data.message;
+      await creatertcpeer();
       peerConn.setRemoteDescription(
         new RTCSessionDescription(remoteRTCMessage)
       );
+
+      if (iceCandidatesCollected.length > 0) {
+        for (let i = 0; i < iceCandidatesCollected.length; i++) {
+            let candidate = iceCandidatesCollected[i];
+            try {
+                await peerConn.addIceCandidate(candidate)
+            } catch (error) {
+              console.log(error);
+            }
+        }
+        iceCandidatesCollected = [];
+    }
 
       const answer = await peerConn.createAnswer();
       await peerConn.setLocalDescription(answer);
@@ -78,29 +108,29 @@ async function message_process(e) {
     }
   } else if (data.message.type === "answer") {
     if (data.answerer !== browserCode) {
-      console.log(data.message);
       remoteRTCMessage = data.message;
-      await peerConn.setRemoteDescription(
+      peerConn.setRemoteDescription(
         new RTCSessionDescription(remoteRTCMessage)
       );
       console.log("Answered");
     };
 
-  } else if (data.msg_type === "candidate") {
-    if (data.fromUser !== "{{request.user.username}}") {
-      try {
-        if (peerConn) {
-          data.candidate && (await peerConn.addIceCandidate(data.candidate));
-        } else {
-          iceCandidatesFromCaller.push(data.candidate);
-        }
-      } catch (e) {
+  }
+  else if (data.message === "candidate") {
+    console.log('candidateee');
+    // if (data.fromUser !== "{{request.user.username}}") {
+    try {
+      if (peerConn) {
+        data.candidate && (await peerConn.addIceCandidate(data.candidate));
+      } else {
+        iceCandidatesCollected.push(data.candidate);
       }
+    } catch (e) {
     }
+    // }
   }
 };
 
-// sendFileButton.addEventListener("click", () => createConnection());
 fileInput.addEventListener("change", handleFileInputChange, false);
 abortButton.addEventListener("click", () => {
   if (fileReader && fileReader.readyState === 1) {
@@ -125,12 +155,12 @@ async function createConnection() {
   const localConnection = new RTCPeerConnection(configuration);
   sendChannel = localConnection.createDataChannel("sendDataChannel");
   sendChannel.binaryType = "arraybuffer";
-  console.log("Created send data channel");
 
   sendChannel.addEventListener("open", onSendChannelStateChange);
   sendChannel.addEventListener("close", onSendChannelStateChange);
   sendChannel.addEventListener("error", onError);
 
+  await creatertcpeer();
 
   try {
     const offer = await localConnection.createOffer();
@@ -191,7 +221,6 @@ function onError(error) {
     return;
   }
 }
-// const sendFileButton = document.querySelector("button#sendButton12");
 
 sendFileButton.addEventListener("click", () => createConnection());
 
@@ -210,18 +239,3 @@ socketconnection.addEventListener("click", () => {
     messageInputDom.value = "";
   };
 });
-
-// async function creatertcpeer() {
-//   peerConn = new RTCPeerConnection(iceServers);
-
-//   peerConn.addEventListener("icecandidate", (event) => {
-//     if (event.candidate) {
-//       socket.send(
-//         JSON.stringify({
-//           msg_type: "candidate",
-//           candidate: event.candidate,
-//         })
-//       );
-//     }
-//   });
-// }

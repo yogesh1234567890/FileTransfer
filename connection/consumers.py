@@ -27,8 +27,7 @@ class SharingConsumer(AsyncWebsocketConsumer):
                 {"type": "chat_message", "offer": offer, "sender": sender},
             )
 
-        if text_data_json["msg_type"] == "answer":
-            print(text_data_json)
+        elif text_data_json["msg_type"] == "answer":
             answer = text_data_json.get("answer")
             answerer = text_data_json.get("answerer")
             await self.channel_layer.group_send(
@@ -38,6 +37,13 @@ class SharingConsumer(AsyncWebsocketConsumer):
                     "answer": answer,
                     "answerer": answerer,
                 },
+            )
+
+        elif text_data_json["msg_type"] == "candidate":
+            candidate = text_data_json.get("candidate")
+            print(candidate)
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "ICEcandidate", "candidate": candidate}
             )
 
     async def chat_message(self, event):
@@ -50,4 +56,15 @@ class SharingConsumer(AsyncWebsocketConsumer):
         answerer = event["answerer"]
         await self.send(
             text_data=json.dumps({"message": message, "answerer": answerer})
+        )
+
+    async def ICEcandidate(self, event):
+        candidate = event["candidate"]
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "message": "candidate",
+                    "candidate": candidate,
+                }
+            )
         )
