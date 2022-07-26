@@ -1,0 +1,31 @@
+.title h1 p{
+  margin-top: 30px;
+  padding: 20px;
+  font-weight: 900;
+}
+.title p{
+   margin-top: 5%;
+   }
+
+.background-main {
+  width: 100%;
+}
+.navbar {
+  background-color: #dde5f8;
+}
+
+.text-left{
+   margin: auto;
+   padding-top: 100px
+}
+
+.start{
+   margin-top: 10%;
+   margin-bottom: 10%;
+   border-radius: 50px;
+   background-color: #8fc0c9;
+   border: none;
+   margin-left: 60px;
+   height: 50px;
+   width: 200px;
+}

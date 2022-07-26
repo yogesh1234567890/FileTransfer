@@ -46,6 +46,12 @@ class SharingConsumer(AsyncWebsocketConsumer):
                 self.room_group_name, {"type": "ICEcandidate", "candidate": candidate}
             )
 
+        elif text_data_json["msg_type"] == "file_info":
+            data = text_data_json.get("data")
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "file_info", "data": data}
+            )
+
     async def chat_message(self, event):
         message = event["offer"]
         sender = event["sender"]
@@ -65,6 +71,17 @@ class SharingConsumer(AsyncWebsocketConsumer):
                 {
                     "message": "candidate",
                     "candidate": candidate,
+                }
+            )
+        )
+
+    async def file_info(self, event):
+        data = event["data"]
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "message": "file_information",
+                    "data": data,
                 }
             )
         )

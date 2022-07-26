@@ -5,9 +5,20 @@ let receiveChannel;
 let fileReader;
 var iceCandidatesCollected = [];
 
+
 const configuration = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  iceServers: [
+      {
+          urls: 'stun:stun.filesharenow.tech'
+      },
+      {
+          urls: 'turn:turn.filesharenow.tech:3478?transport=udp',
+          username: 'guest',
+          credential: 'somepassword'
+      }
+  ]
 };
+
 
 const bitrateDiv = document.querySelector("div#bitrate");
 const fileInput = document.querySelector("input#fileInput");
@@ -35,6 +46,15 @@ let ws_scheme = window.location.protocol == "https:" ? "wss://" : "ws://";
 function sendData() {
   const file = fileInput.files[0];
   console.log(`File is ${[file.name, file.size, file.type, file.lastModified].join(' ')}`);
+  socket.send(
+    JSON.stringify({
+      msg_type: "file_info",
+      data: {
+        name: file.name,
+        size: file.size
+      },
+    })
+  );
 
   // Handle 0 size files.
   statusMessage.textContent = '';
@@ -80,7 +100,6 @@ async function websocket() {
 
   socket.onmessage = async function (e) {
     const data = JSON.parse(e.data);
-    document.querySelector("#chat-log").value += data.message + "\n";
     message_process(e);
   };
 
@@ -95,6 +114,7 @@ async function websocket() {
 
 async function creatertcpeer() {
   peerConn = new RTCPeerConnection(configuration);
+  // peerConn = new RTCPeerConnection();
   console.log('Created local peer connection object localConnection');
 
   peerConn.addEventListener("icecandidate", (event) => {
@@ -140,14 +160,14 @@ function onReceiveMessageCallback(event) {
   // we are assuming that our signaling protocol told
   // about the expected file size (and name, hash, etc).
   const file = fileInput.files[0];
-  if (receivedSize === file.size) {
+  if (receivedSize === file_information.size) {
     const received = new Blob(receiveBuffer);
     receiveBuffer = [];
 
     downloadAnchor.href = URL.createObjectURL(received);
-    downloadAnchor.download = file.name;
+    downloadAnchor.download = file_information.name;
     downloadAnchor.textContent =
-      `Click to download '${file.name}' (${file.size} bytes)`;
+      `Click to download '${file_information.name}' (${file_information.size} bytes)`;
     downloadAnchor.style.display = 'block';
 
     const bitrate = Math.round(receivedSize * 8 /
@@ -160,7 +180,7 @@ function onReceiveMessageCallback(event) {
       statsInterval = null;
     }
 
-    closeDataChannels();
+    // closeDataChannels();
   }
 }
 
@@ -264,6 +284,10 @@ async function message_process(e) {
     }
     // }
   }
+
+  else if (data.message === "file_information") {
+    window.file_information = data.data;
+  }
 };
 
 fileInput.addEventListener("change", handleFileInputChange, false);
@@ -348,7 +372,6 @@ function onSendChannelStateChange() {
       console.log("Send channel is open");
       sendData();
     }
-    onSendChannelStateChange;
   }
 }
 

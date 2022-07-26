@@ -11,14 +11,20 @@
       media="all"
     />
     <script src="{% static 'js/connect.js' %}" defer></script>
-    {% comment %} <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script> {% endcomment %}
-
+    <link rel="stylesheet" href="{% static 'css/ripple.css' %}" />
   </head>
+
   <body>
-    <h1>FILE TRANSFER</h1>
+    <header>
+
+      <div class="ripple-1"></div>
+      <div class="ripple-2"></div>
+      <div class="ripple-3"></div>
+      <div class="ripple-4"></div>
+      <div class="ripple-5"></div>
+    </header>
     <b id="browser-code">{{code}}</b>
 
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
 
     <div class="controlbox">
       <label for="message"
@@ -53,7 +59,9 @@
     <div class="progress">
       <div class="label">Receive progress: </div>
       <progress id="receiveProgress" max="0" value="0"></progress>
+
     </div>
+
 
     <div id="bitrate"></div>
     <a id="download"></a>
