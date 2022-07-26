@@ -1,23 +1,6 @@
-from unittest import result
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.views import View
-import string, random
-
-
-class GreetingView(View):
-    greeting = "Good Day"
-
-    def get(self, request):
-        return HttpResponse(self.greeting)
-
-
-def index(request):
-    return render(request, "index.html", {})
-
-
-def room(request, room_name):
-    return render(request, "room.html", {"room_name": room_name})
+import string
+import random
 
 
 def generate_code(request):
@@ -29,3 +12,7 @@ def generate_code(request):
 def file_upload(request):
     code = generate_code(request)
     return render(request, "file_upload.html", {"code": code})
+
+
+def dashboard(request):
+    return render(request, "dashboard.html")
