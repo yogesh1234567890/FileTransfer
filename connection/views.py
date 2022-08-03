@@ -15,4 +15,8 @@ def file_upload(request):
 
 
 def dashboard(request):
-    return render(request, "dashboard.html")
+    return render(request, "index.html")
+
+
+def actionPage(request):
+    return render(request, "transfer.html")

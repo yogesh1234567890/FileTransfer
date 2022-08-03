@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Secure file transfer</title>
+
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Google fonts-->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{% static 'css/new/styles.css'%}" rel="stylesheet" />
+        <link href="{% static 'css/new/main.css' %}" rel="stylesheet" />
+    </head>
+    <body id="page-top">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+            <div class="container px-5">
+                <a class="navbar-brand fw-bold" href="#">File Share</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="bi-list"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    {% comment %} <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
+                        <li class="nav-item"><a class="nav-link me-lg-3" href="#home">Home</a></li>
+                        <li class="nav-item"><a class="nav-link me-lg-3" href="transfer.html">Transfer File</a></li>
+                    </ul>
+                    <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0">
+                        <span class="d-flex align-items-center">
+                            <span class="small">Get started</span>
+                        </span>
+                    </button> {% endcomment %}
+                </div>
+            </div>
+        </nav>
+        <!-- header-->
+        <header>
+            <div class="container px-5">
+                <div class="row gx-5 align-items-center">
+                    <h1> Share code to receiver</h1>
+                </div>
+            </div>
+
+        <!-- Quote/testimonial aside-->
+        <aside class="text-center bg-gradient-primary-to-secondary">
+            <div class="container px-5 ">
+                <div class="row gx-5 justify-content-center align-items-center">
+                    <div class="col-xl-8">
+                        <h3 class="text-white"> Share code with receiver</h3>
+                        <div class="input-group mb-3 ">
+                            <input type="text" class="form-control" placeholder="ygsxhjs" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                              <span class="input-group-text" id="basic-addon2">Copy</span>
+                            </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+         </header>
+        <!-- App features section-->
+
+        <section class="bg-light">
+            <div class="container px-5">
+                <div class="row gx-5">
+                    <div class="row">
+                        <div class="col"></div>
+                        <div onclick="location.href='{% url 'connection:file_upload' %}';" style="cursor: pointer;" class="col">
+                            <div class="card">
+                                <img class="" class="rounded-50" src="{% static 'assets/img/send.png' %}" alt="..." />
+                                <h3 class="lh-1 mt-4 mb-4 text-muted">Sender</h3>
+                                <p class="lead text-muted mb-5 mb-lg-0">Click here and share the code to send file.</p>
+                            </div>
+                        </div>
+                        <div onclick="location.href='{% url 'connection:file_upload' %}';" style="cursor: pointer;" class="col">
+                            <div class="card">
+                                <img class="" class="rounded-50" src="{% static 'assets/img/receive.png' %}" alt="..." />
+                                <h3 class="lh-1 mt-4 mb-4 text-muted">Receiver</h3>
+                                <p class="lead text-muted mb-5 mb-lg-0">Click here and enter the code to connect to receive file.</p>
+                            </div>
+                        </div>
+                        <div class="col"></div>
+                      </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer-->
+        <footer class="bg-black text-center py-5">
+            <div class="container px-5">
+                <div class="text-white-50 small">
+                    <div class="mb-2">&copy; Your Website 2022. All Rights Reserved.</div>
+                    <a href="#!">Privacy</a>
+                    <span class="mx-1">&middot;</span>
+                    <a href="#!">Terms</a>
+                </div>
+            </div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="{% static 'js/scripts.js' %}"></script>
+        <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+    </body>
+</html>

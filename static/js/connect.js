@@ -115,7 +115,6 @@ async function websocket() {
 async function creatertcpeer() {
   peerConn = new RTCPeerConnection(configuration);
   // peerConn = new RTCPeerConnection();
-  console.log('Created local peer connection object localConnection');
 
   peerConn.addEventListener("icecandidate", (event) => {
     console.log('Local ICE candidate: ', event.candidate);
@@ -272,7 +271,6 @@ async function message_process(e) {
 
   }
   else if (data.message === "candidate") {
-    console.log('candidateee');
     // if (data.fromUser !== "{{request.user.username}}") {
     try {
       if (peerConn) {
