@@ -1,0 +1,125 @@
+body {
+  /* overflow: hidden; */
+  text-align: center;
+  font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+}
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.card{
+    border-radius: 4px;
+    align-items: center;
+    background: #fff;
+    box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
+    transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
+    padding: 30px;
+    cursor: pointer;
+}
+
+.card:hover{
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+}
+
+@media(max-width: 990px){
+    .card{
+      margin: 20px;
+    }
+  }
+
+
+  .header_ripple{
+    min-height: 95vh;
+    background-color: #2937f0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  h1 {
+      margin: 10px;
+    color: white;
+  }
+   /* search */
+   .search .found{
+    width: 60px;
+    margin-top: 25px;
+    height: 60px;
+    background: #fff;
+    position: relative;
+    animation: mymove 8s 1;
+    animation-delay: 10s;
+    border-radius:50px;
+   align-items:center;
+  }
+
+  @keyframes mymove {
+    from {top: 0px;}
+    to {top: 150px;}
+  }
+
+
+  #ripple, #ripple2, #ripple3, #ripple4, #ripple5 {
+
+    background-color: #fff;
+    border-radius: 50%;
+    border: 1px solid #5DADE2;
+    box-shadow: 0 0 20px #fff;
+    position: absolute;
+    bottom: 32px;
+    margin-bottom: -1001px;
+    right: 50%;
+    animation: shrink 10s linear infinite;
+    z-index: 10;
+  }
+
+  #ripple2 {animation-delay: 2s;}
+  #ripple3 {animation-delay: 4s;}
+  #ripple4 {animation-delay: 6s;}
+  #ripple5 {animation-delay: 6s;}
+
+  @keyframes shrink {
+    0% {
+      margin-bottom: 0;
+      margin-right: 0;
+      width: 0;
+      height: 0;
+      opacity: 0;}
+    10% { opacity: 0.5;}
+    60% { opacity: 0;}
+    100% {
+      margin-bottom: -1001px;
+      margin-right: -1001px;
+      width: 2000px;
+      height: 2000px;
+      opacity: 0;}
+  }
+
+
+  @keyframes down {
+    0% {top: 0; opacity: 0;}
+    30% { opacity: 1;}
+    50% { opacity: 1;}
+    90% { opacity: 0;}
+    100% {top: 100%; opacity: 0;}
+  }
+
+  #btn {
+    width: 60px;
+    height: 45px;
+    position: absolute;
+    bottom: 10px;
+    right: 50%;
+    margin-right: -30px;
+    text-align: center;
+    padding-top: 5px;
+    border-radius: 3px;
+    z-index: 80;
+  }
+
+  #btn > img {
+    border-radius: 50px;
+    animation: pop 0s linear infinite;
+
+  }

@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+      <meta name="description" content="" />
+      <meta name="author" content="" />
+      <title>Secure file transfer</title>
+      <!-- Google fonts-->
+      <link href="{% static 'css/new/styles.css' %}" rel="stylesheet" />
+      <link href="{% static 'css/new/main.css' %}" rel="stylesheet" />
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+      <script src="{% static 'js/rocket.js' %}"></script>
+   </head>
+   <body id="page-top">
+      <!-- Navigation-->
+      <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+         <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="#page-top">File Share</a>
+         </div>
+      </nav>
+      <header>
+         <div class="container px-5">
+             <div class="row gx-5 align-items-center">
+                 <h1> Share code to receiver</h1>
+             </div>
+         </div>
+
+     <!-- Quote/testimonial aside-->
+     <aside class="text-center bg-gradient-primary-to-secondary">
+         <div class="container px-5 ">
+             <div class="row gx-5 justify-content-center align-items-center">
+                 <div class="col-xl-5">
+                     <h3 class="text-white"> Select a file to send</h3>
+                     <div id="file-upload">
+                        <form id="fileInfo">
+                           <input type="file" id="fileInput" name="files"/>
+                        </form>
+                        <button class="btn btn-primary" disabled id="sendFile">Send</button>
+                        <button class ="btn btn-outline-warning" disabled id="abortButton">Abort</button>
+                     </div>
+                 </div>
+             </div>
+         </div>
+
+     </aside>
+      </header>
+      <div class="bg-gradient-primary-to-secondary">
+         {% comment %} <canvas id="playground" width="400" height="200"></canvas> {% endcomment %}
+         <div class="controlbox" id="connectionbox">
+            <label for="message"
+               >Enter the code to connect:
+            <input
+               type="text"
+               id="message"
+               placeholder="code here"
+               size="10"
+               maxlength="20"
+               />
+            </label>
+            <button class="btn btn-primary" id="connectButton" name="connectButton">
+            Connect
+            </button>
+         </div>
+      </div>
+      <section class="bg-light">
+         <div class="container px-5">
+             <div class="row gx-5">
+                 <div class="row">
+                     <div class="col"></div>
+                     <div class="col">
+                         <div class="card">
+                           <div class="progress" id="send-progress">
+                              <div class="label">Send progress: </div>
+                              <progress id="sendProgress" max="0" value="0"></progress>
+                              <div class="progress">
+                                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                               </div>
+                           </div>
+
+                           <div class="progress" id="receive-progress">
+                              <div class="label">Receive progress: </div>
+                              <progress id="receiveProgress" max="0" value="0"></progress>
+                           </div>
+                           <div id="bitrate"></div>
+                           <a id="download"></a>
+                           <span id="status"></span>
+                         </div>
+                     </div>
+
+                     <div class="col"></div>
+                   </div>
+             </div>
+         </div>
+     </section>
+      <!-- Footer-->
+      <footer class="bg-black text-center py-5">
+         <div class="container px-5">
+            <div class="text-white-50 small">
+               <div class="mb-2">&copy; Your Website 2022. All Rights Reserved.</div>
+               <a href="#!">Privacy</a>
+               <span class="mx-1">&middot;</span>
+               <a href="#!">Terms</a>
+            </div>
+         </div>
+      </footer>
+      <!-- Bootstrap core JS-->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+      <!-- Core theme JS-->
+      <script src="{% static 'js/connect.js' %}" defer></script>
+      <script src="{% static 'js/scripts.js' %}"></script>
+   </body>
+</html>
