@@ -10,8 +10,7 @@ def generate_code(request):
 
 
 def file_upload(request):
-    code = generate_code(request)
-    return render(request, "file_upload.html", {"code": code})
+    return render(request, "file_up.html")
 
 
 def dashboard(request):
@@ -19,4 +18,5 @@ def dashboard(request):
 
 
 def actionPage(request):
-    return render(request, "transfer.html")
+    code = generate_code(request)
+    return render(request, "transfer.html", {"code": code})

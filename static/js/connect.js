@@ -29,7 +29,6 @@ const receiveProgress = document.querySelector("progress#receiveProgress");
 const statusMessage = document.querySelector("span#status");
 const sendFileButton = document.querySelector("button#sendFile");
 
-var browserCode = document.querySelector("#browser-code").innerHTML;
 
 let receiveBuffer = [];
 let receivedSize = 0;
@@ -89,9 +88,9 @@ function sendData() {
   readSlice(0);
 }
 
-async function websocket() {
+async function websocket(browserCode) {
   let endpoint =
-    ws_scheme + window.location.host + `/ws/connect/${inputValue.value}/`;
+    ws_scheme + window.location.host + `/ws/connect/${browserCode}/`;
   window.socket = new WebSocket(endpoint);
 
   socket.onopen = async function (e) {
@@ -113,8 +112,8 @@ async function websocket() {
 }
 
 async function creatertcpeer() {
-  peerConn = new RTCPeerConnection(configuration);
-  // peerConn = new RTCPeerConnection();
+  // peerConn = new RTCPeerConnection(configuration);
+  peerConn = new RTCPeerConnection();
 
   peerConn.addEventListener("icecandidate", (event) => {
     console.log('Local ICE candidate: ', event.candidate);
@@ -382,18 +381,17 @@ function onError(error) {
 
 sendFileButton.addEventListener("click", () => createConnection());
 
-const socketconnection = document.getElementById("connectButton");
-var inputValue = document.getElementById("message");
-socketconnection.addEventListener("click", () => {
-  websocket();
-  document.querySelector("#chatbutton").onclick = function (e) {
-    const messageInputDom = document.querySelector("#chat");
-    const message = messageInputDom.value;
-    socket.send(
-      JSON.stringify({
-        message: message,
-      })
-    );
-    messageInputDom.value = "";
-  };
-});
+
+const params1 = new URLSearchParams(window.location.search);
+if (params1.get('role')=='sender'){
+  var browserCode = params1.get('code');
+  window.onload=websocket(browserCode);
+
+}
+if (params1.get('role')=='receiver'){
+  const socketconnection = document.getElementById("connectButton");
+  socketconnection.addEventListener("click", () => {
+    var browserCode = document.querySelector("#message").value;
+    window.onload=websocket(browserCode);
+  });
+ }
