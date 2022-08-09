@@ -32,25 +32,28 @@
          <div class="container px-5 ">
              <div class="row gx-5 justify-content-center align-items-center">
                  <div class="col-xl-5">
-                     <h3 class="text-white"> Select a file to send</h3>
-                     <div id="file-upload">
-                        <form id="fileInfo">
+                     <h3 id="info" class="text-white"> Select a file to send</h3>
+                     <div class="mb-4 align-items-center" id="file-upload">
+                        <form class="justify-content-center" id="fileInfo">
                            <input type="file" id="fileInput" name="files"/>
                         </form>
-                        <button class="btn btn-primary" disabled id="sendFile">Send</button>
-                        <button class ="btn btn-outline-warning" disabled id="abortButton">Abort</button>
+                        <div class="mt-4">
+                           <button class="btn btn-primary" disabled id="sendFile">Send</button>
+                           <button class ="btn btn-outline-warning" disabled id="abortButton">Abort</button>
+                        </div
                      </div>
                  </div>
              </div>
          </div>
-
+         <div class="connection-alert alert alert-primary" role="alert">
+            Connection Established !!
+         </div>
      </aside>
       </header>
       <div class="bg-gradient-primary-to-secondary">
          {% comment %} <canvas id="playground" width="400" height="200"></canvas> {% endcomment %}
          <div class="controlbox" id="connectionbox">
-            <label for="message"
-               >Enter the code to connect:
+            <label for="message">Enter the code to connect:
             <input
                type="text"
                id="message"

@@ -28,7 +28,8 @@ const sendProgress = document.querySelector("progress#sendProgress");
 const receiveProgress = document.querySelector("progress#receiveProgress");
 const statusMessage = document.querySelector("span#status");
 const sendFileButton = document.querySelector("button#sendFile");
-
+const connectionalert = document.getElementsByClassName("connection-alert");
+connectionalert[0].style.display = "none";
 
 let receiveBuffer = [];
 let receivedSize = 0;
@@ -112,8 +113,8 @@ async function websocket(browserCode) {
 }
 
 async function creatertcpeer() {
-  // peerConn = new RTCPeerConnection(configuration);
-  peerConn = new RTCPeerConnection();
+  peerConn = new RTCPeerConnection(configuration);
+  // peerConn = new RTCPeerConnection();
 
   peerConn.addEventListener("icecandidate", (event) => {
     console.log('Local ICE candidate: ', event.candidate);
@@ -270,7 +271,7 @@ async function message_process(e) {
 
   }
   else if (data.message === "candidate") {
-    // if (data.fromUser !== "{{request.user.username}}") {
+    connectionalert[0].style.display = "block";
     try {
       if (peerConn) {
         data.candidate && (await peerConn.addIceCandidate(data.candidate));

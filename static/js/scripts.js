@@ -6,4 +6,5 @@ if (params.get('role')=='sender'){
 if (params.get('role')=='receiver'){
     $('#send-progress').hide();
     $('#file-upload').hide();
+    $('#info').hide();
  }
