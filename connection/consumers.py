@@ -1,21 +1,23 @@
 import json
+import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+logger = logging.getLogger(__name__)
 
 class SharingConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Join room group for sharing files
+        """Handles WebSocket connection and joins the room group."""
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = "chat_%s" % self.room_name
+        self.room_group_name = f"chat_{self.room_name}"
 
-        # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-
         await self.accept()
+        logger.info(f"WebSocket connected to room: {self.room_name}")
 
     async def disconnect(self, close_code):
-        # Leave room group
+        """Handles WebSocket disconnection and leaves the room group."""
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        logger.info(f"WebSocket disconnected from room: {self.room_name}")
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
